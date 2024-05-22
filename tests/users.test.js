@@ -67,7 +67,7 @@ describe("POST /api/users", () => {
       .post("api/users")
       .send(userWithMissingProps);
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(422);
   });
 });
 
@@ -131,24 +131,22 @@ describe("PUT /api/users/id", () => {
       .post("api/users")
       .send(userWithMissingProps);
 
-    expect(response.status).toEqual(500);
+    expect(response.status).toEqual(422);
   });
 
   it("should return no user", async () => {
     const newUser = {
       firstname: "Alex",
-      lastname: "James Cameron",
-      email: "2009",
-      city: "1",
-      language: 162,
+      lastname: "Casey",
+      email: "alex.casey@coldcase.com",
+      city: "New York",
+      language: "English",
     };
 
-    const response = (await request(app).put("/api/movies/0")).send(newMovie);
+    const response = (await request(app).put("/api/users/0")).send(newUser);
 
     expect(response.status).toEqual(404);
   });
-
-
-})
+});
 
 afterAll(() => database.end());
