@@ -71,4 +71,84 @@ describe("POST /api/users", () => {
   });
 });
 
+describe("PUT /api/users/id", () => {
+  it("should edit user", async () => {
+    const newUser = {
+      firstname: "Alan",
+      lastname: "Wake",
+      email: "alan.wake@wildcodeschool.com",
+      city: "New York",
+      language: "English"
+    };
+
+    const [result] = await database.query(
+      "INSERT INTO users (firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
+      [newUser.firstname, newUser.lastname, newUser.email, newUser.city, newUser.language]
+    );
+
+    const id = result.insertId;
+
+    const updatedUser = {
+      firstname: "Thomas",
+      lastname: "Zane",
+      email: "thomas.zane@yotonyo.com",
+      city: "Helsinki",
+      language: "Finnish",
+    };
+
+    const response = await request(app)
+    .put(`/api/users/${id}`)
+    .send(updatedUser);
+
+    expect(response.status).toEqual(204);
+
+    const [users] = await database.query("SELECT * FROM users WHERE id= ?", id);
+
+    const [userInDatabase] = users;
+
+    except(userInDatabase).toHaveProperty("id");
+
+    except(userInDatabase).toHaveProperty("firstname");
+    expect(userInDatabase).toStrictEqual(updatedUser.firstname);
+
+    except(userInDatabase).toHaveProperty("lastname");
+    expect(userInDatabase).toStrictEqual(updatedUser.lastname);
+
+    except(userInDatabase).toHaveProperty("email");
+    expect(userInDatabase).toStrictEqual(updatedUser.email);
+
+    except(userInDatabase).toHaveProperty("city");
+    expect(userInDatabase).toStrictEqual(updatedUser.city);
+
+    except(userInDatabase).toHaveProperty("language");
+    expect(userInDatabase).toStrictEqual(updatedUser.language);
+  });
+
+  it("should return an error", async () => {
+    const userWithMissingProps = { firstname: "Claude" };
+
+    const response = await request(app)
+      .post("api/users")
+      .send(userWithMissingProps);
+
+    expect(response.status).toEqual(500);
+  });
+
+  it("should return no user", async () => {
+    const newUser = {
+      firstname: "Alex",
+      lastname: "James Cameron",
+      email: "2009",
+      city: "1",
+      language: 162,
+    };
+
+    const response = (await request(app).put("/api/movies/0")).send(newMovie);
+
+    expect(response.status).toEqual(404);
+  });
+
+
+})
+
 afterAll(() => database.end());
