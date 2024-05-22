@@ -1,19 +1,30 @@
 const validateMovie = (req, res, next) => {
     const { title, director, year, color, duration } = req.body;
-    
+    const errors = [];
+  
     if (title == null) {
-        res.status(422).send("The field 'title' is required");
-    } else if (director == null) {
-        res.status(422).send("The field 'director' is required");
-    } else if (year == null) {
-        res.status(422).send("The field 'year' is required");
-    } else if (color == null) {
-        res.status(422).send("The field 'color' is required");
-    } else if (duration = null) {
-        res.status(422).send("The field 'duration' is required");
-    } else {
-        next();
+      errors.push({ field: "title", message: "This field is required" });
+    } else if (title.length >= 255) {
+        errors.push({field: "title", message: "Le titre contient trop de caractères (+255), réduis !"})
     }
-};
+    if (director == null) {
+      errors.push({ field: "director", message: "This field is required" });
+    }
+    if (year == null) {
+      errors.push({ field: "year", message: "This field is required" });
+    }
+    if (color == null) {
+      errors.push({ field: "color", message: "This field is required" });
+    }
+    if (duration == null) {
+      errors.push({ field: "duration", message: "This field is required" });
+    }
+   
+    if (errors.length) {
+      res.status(422).json({ validationErrors: errors });
+    } else {
+      next();
+    }
+  };
 
-module.exports = validateMovie;
+  module.exports = validateMovie;
