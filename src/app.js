@@ -21,12 +21,12 @@ app.delete("/api/movies/:id", movieControllers.deleteMovie);
 /*-----------------------------USERS----------------------------*/
 
 const userControllers = require("./controllers/userControllers");
-const validateUser = require("./middlewares/validateUser");
+const { hashPassword } = require("./middlewares/auth");
 
 app.get("/api/users", userControllers.getUsers);
 app.get("/api/users/:id", userControllers.getUsersById);
-app.post("/api/users", validateUser, userControllers.postUsers);
-app.put("/api/users/:id", validateUser, userControllers.updateUsers);
+app.post("/api/users", hashPassword, userControllers.postUsers);
+app.put("/api/users/:id", hashPassword, userControllers.updateUsers);
 app.delete("/api/users/:id", userControllers.deleteUsers);
 
 

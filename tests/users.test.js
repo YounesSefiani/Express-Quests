@@ -86,7 +86,13 @@ describe("PUT /api/users/:id", () => {
 
     const [result] = await database.query(
       "INSERT INTO users(firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
-      [newUser.firstname, newUser.lastname, newUser.email, newUser.city, newUser.language]
+      [
+        newUser.firstname,
+        newUser.lastname,
+        newUser.email,
+        newUser.city,
+        newUser.language,
+      ]
     );
 
     const id = result.insertId;
@@ -100,8 +106,8 @@ describe("PUT /api/users/:id", () => {
     };
 
     const response = await request(app)
-    .put(`/api/users/${id}`)
-    .send(updatedUser);
+      .put(`/api/users/${id}`)
+      .send(updatedUser);
 
     expect(response.status).toEqual(204);
 
@@ -153,7 +159,7 @@ describe("PUT /api/users/:id", () => {
 });
 
 describe("DELETE /api/users/:id", () => {
-  it("should delete a user", async() => {
+  it("should delete a user", async () => {
     const newUser = {
       firstname: "Charles",
       lastname: "Crowley",
@@ -164,7 +170,13 @@ describe("DELETE /api/users/:id", () => {
 
     const [resultInsert] = await database.query(
       "INSERT INTO users (firstname, lastname, email, city, language) VALUES (?, ?, ?, ?, ?)",
-      [newUser.firstname, newUser.lastname, newUser.email, newUser.city, newUser.language]
+      [
+        newUser.firstname,
+        newUser.lastname,
+        newUser.email,
+        newUser.city,
+        newUser.language,
+      ]
     );
 
     const id = resultInsert.insertId;
@@ -173,7 +185,9 @@ describe("DELETE /api/users/:id", () => {
 
     expect(response.status).toEqual(204);
 
-    const [result] = await database.query("SELECT * FROM users WHERE id = ?", [id]);
+    const [result] = await database.query("SELECT * FROM users WHERE id = ?", [
+      id,
+    ]);
 
     const [userInDatabase] = result;
 
