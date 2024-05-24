@@ -151,34 +151,36 @@ describe("PUT /api/movies/:id", () => {
   });
 });
 
-describe("DELETE api/movies/:id", () => {
+describe("DELETE /api/movies/:id", () => {
   it("should delete a movie", async() => {
     const newMovie = {
       title: "Projet X",
       director: "Nima Nourizadeh",
       year: "2012",
       color: "1",
-      duration: 88
+      duration: 88,
     };
 
-    const [result] = await database.query(
-      "INSERT INTO movies (title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)"
+    const [resultInsert] = await database.query(
+      "INSERT INTO movies (title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
       [newMovie.title, newMovie.director, newMovie.year, newMovie.color, newMovie.duration]
     );
 
-    const id = result.insertId;
+    const id = resultInsert.insertId;
 
-    const response = await request(app).delete(`api/movies/${id}`);
+    const response = await request(app).delete(`/api/movies/${id}`);
 
     expect(response.status).toEqual(204);
 
-    const [movies] = await database.query("SELECT * FROM movies WHERE id = ?", [id]);
+    const [result] = await database.query("SELECT * FROM movies WHERE id = ?", [id]);
 
-    expect(movies.length).toBe(0);
+    const [movieInDatabase] = result;
+
+    expect(movieInDatabase).toBeUndefined();
   });
 
   it("should return 404 if movie not found", async () => {
-    const response = await request(app).delete("api/movies/0");
+    const response = await request(app).get("/api/movies/0");
 
     expect(response.status).toEqual(404);
   });
