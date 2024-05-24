@@ -55,8 +55,11 @@ describe("POST /api/movies", () => {
 
     expect(movieInDatabase).toHaveProperty("id");
 
-    expect(movieInDatabase).toHaveProperty("title");
-    expect(movieInDatabase).toStrictEqual(newMovie.title);
+    expect(movieInDatabase.title).toStrictEqual(newMovie.title);
+    expect(movieInDatabase.director).toStrictEqual(newMovie.director);
+    expect(movieInDatabase.year).toStrictEqual(newMovie.year);
+    expect(movieInDatabase.color).toStrictEqual(newMovie.color);
+    expect(movieInDatabase.duration).toStrictEqual(newMovie.duration);
   });
 
   it("should return an error", async () => {
@@ -70,7 +73,7 @@ describe("POST /api/movies", () => {
   });
 });
 
-describe("PUT /api/movies/id", () => {
+describe("PUT /api/movies/:id", () => {
   it("should edit movie", async () => {
     const newMovie = {
       title: "Avatar",
@@ -84,7 +87,7 @@ describe("PUT /api/movies/id", () => {
       "INSERT INTO movies(title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)",
       [newMovie.title, newMovie.director, newMovie.year, newMovie.color, newMovie.duration]
     );
-    
+
     const id = result.insertId;
 
     const updatedMovie = {
@@ -105,22 +108,22 @@ describe("PUT /api/movies/id", () => {
 
     const [movieInDatabase] = movies;
 
-    except(movieInDatabase).toHaveProperty("id");
+    expect(movieInDatabase).toHaveProperty("id");
 
-    except(movieInDatabase).toHaveProperty("title");
-    expect(movieInDatabase).toStrictEqual(updatedMovie.title);
+    expect(movieInDatabase).toHaveProperty("title");
+    expect(movieInDatabase.title).toStrictEqual(updatedMovie.title);
 
-    except(movieInDatabase).toHaveProperty("director");
-    expect(movieInDatabase).toStrictEqual(updatedMovie.director);
+    expect(movieInDatabase).toHaveProperty("director");
+    expect(movieInDatabase.director).toStrictEqual(updatedMovie.director);
 
-    except(movieInDatabase).toHaveProperty("year");
-    expect(movieInDatabase).toStrictEqual(updatedMovie.year);
+    expect(movieInDatabase).toHaveProperty("year");
+    expect(movieInDatabase.year).toStrictEqual(updatedMovie.year);
 
-    except(movieInDatabase).toHaveProperty("color");
-    expect(movieInDatabase).toStrictEqual(updatedMovie.color);
+    expect(movieInDatabase).toHaveProperty("color");
+    expect(movieInDatabase.color).toStrictEqual(updatedMovie.color);
 
-    except(movieInDatabase).toHaveProperty("duration");
-    expect(movieInDatabase).toStrictEqual(updatedMovie.duration);
+    expect(movieInDatabase).toHaveProperty("duration");
+    expect(movieInDatabase.duration).toStrictEqual(updatedMovie.duration);
   });
 
   it("should return an error", async () => {
@@ -142,7 +145,40 @@ describe("PUT /api/movies/id", () => {
       duration: 162,
     };
 
-    const response = (await request(app).put("/api/movies/0")).send(newMovie);
+    const response = await request(app).put("/api/movies/0").send(newMovie);
+
+    expect(response.status).toEqual(404);
+  });
+});
+
+describe("DELETE api/movies/:id", () => {
+  it("should delete a movie", async() => {
+    const newMovie = {
+      title: "Projet X",
+      director: "Nima Nourizadeh",
+      year: "2012",
+      color: "1",
+      duration: 88
+    };
+
+    const [result] = await database.query(
+      "INSERT INTO movies (title, director, year, color, duration) VALUES (?, ?, ?, ?, ?)"
+      [newMovie.title, newMovie.director, newMovie.year, newMovie.color, newMovie.duration]
+    );
+
+    const id = result.insertId;
+
+    const response = await request(app).delete(`api/movies/${id}`);
+
+    expect(response.status).toEqual(204);
+
+    const [movies] = await database.query("SELECT * FROM movies WHERE id = ?", [id]);
+
+    expect(movies.length).toBe(0);
+  });
+
+  it("should return 404 if movie not found", async () => {
+    const response = await request(app).delete("api/movies/0");
 
     expect(response.status).toEqual(404);
   });

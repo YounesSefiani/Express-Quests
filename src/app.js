@@ -7,19 +7,27 @@ const app = express();
 
 app.use(express.json());
 
+/*-----------------------------MOVIES----------------------------*/
+
 const movieControllers = require("./controllers/movieControllers");
 const validateMovie = require("./middlewares/validateMovie");
-const validateUser = require("./middlewares/validateUser");
 
 app.get("/api/movies", movieControllers.getMovies);
 app.get("/api/movies/:id", movieControllers.getMovieById);
-app.get("/api/users", movieControllers.getUsers);
-app.get("/api/users/:id", movieControllers.getUsersById);
 app.post("/api/movies", validateMovie, movieControllers.postMovie);
-app.post("/api/users", validateUser, movieControllers.postUsers);
 app.put("/api/movies/:id", validateMovie, movieControllers.updateMovie);
-app.put("/api/users/:id", validateUser, movieControllers.updateUsers);
 app.delete("/api/movies/:id", movieControllers.deleteMovie);
-app.delete("/api/users/:id", movieControllers.deleteUser);
+
+/*-----------------------------USERS----------------------------*/
+
+const userControllers = require("./controllers/userControllers");
+const validateUser = require("./middlewares/validateUser");
+
+app.get("/api/users", userControllers.getUsers);
+app.get("/api/users/:id", userControllers.getUsersById);
+app.post("/api/users", validateUser, userControllers.postUsers);
+app.put("/api/users/:id", validateUser, userControllers.updateUsers);
+app.delete("/api/users/:id", userControllers.deleteUsers);
+
 
 module.exports = app;
