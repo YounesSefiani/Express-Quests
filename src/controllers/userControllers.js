@@ -86,6 +86,11 @@ const postUsers = (req, res) => {
 
 const updateUsers = (req, res) => {
   const id = parseInt(req.params.id);
+
+  if (id !== req.payload.sub) {
+    return res.sendStatus(403);
+  }
+
   const { firstname, lastname, email, city, language, hashedPassword } =
     req.body;
 
@@ -109,6 +114,10 @@ const updateUsers = (req, res) => {
 
 const deleteUsers = (req, res) => {
   const id = parseInt(req.params.id);
+
+  if (id !== req.payload.sub) {
+    return res.sendStatus(403);
+  }
 
   database
     .query("DELETE from users where id = ?", [id])
