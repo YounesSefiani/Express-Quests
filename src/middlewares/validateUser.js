@@ -32,7 +32,7 @@ const validateUser = (req, res, next) => {
     errors.push({ field: "language", message: "This field is required" });
   }
   if (hashedPassword == null) {
-    errors.push({field: "password", message: "This field is required"});
+    errors.push({field: "hashedPassword", message: "This field is required"});
   }
 
   if (errors.length) {

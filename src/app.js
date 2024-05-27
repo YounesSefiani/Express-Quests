@@ -7,27 +7,27 @@ const app = express();
 
 app.use(express.json());
 
-/*-----------------------------MOVIES----------------------------*/
+const { hashPassword, verifyPassword, verifyToken } = require("./middlewares/auth");
+
+
 
 const movieControllers = require("./controllers/movieControllers");
+const userControllers = require("./controllers/userControllers");
 const validateMovie = require("./middlewares/validateMovie");
 
 app.get("/api/movies", movieControllers.getMovies);
 app.get("/api/movies/:id", movieControllers.getMovieById);
-app.post("/api/movies", validateMovie, movieControllers.postMovie);
-app.put("/api/movies/:id", validateMovie, movieControllers.updateMovie);
-app.delete("/api/movies/:id", movieControllers.deleteMovie);
-
-/*-----------------------------USERS----------------------------*/
-
-const userControllers = require("./controllers/userControllers");
-const { hashPassword } = require("./middlewares/auth");
-
 app.get("/api/users", userControllers.getUsers);
 app.get("/api/users/:id", userControllers.getUsersById);
 app.post("/api/users", hashPassword, userControllers.postUsers);
-app.put("/api/users/:id", hashPassword, userControllers.updateUsers);
-app.delete("/api/users/:id", userControllers.deleteUsers);
+app.post("/api/login", userControllers.getUserByEmailWithPasswordAndPassToNext, verifyPassword);
 
+app.use(verifyToken);
+
+app.put("/api/users/:id", hashPassword, verifyToken, userControllers.updateUsers);
+app.delete("/api/users/:id", userControllers.deleteUsers);
+app.post("/api/movies", validateMovie, verifyToken, movieControllers.postMovie);
+app.put("/api/movies/:id", validateMovie, verifyToken, movieControllers.updateMovie);
+app.delete("/api/movies/:id", verifyToken, movieControllers.deleteMovie);
 
 module.exports = app;
